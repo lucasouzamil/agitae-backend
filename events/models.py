@@ -1,6 +1,9 @@
 from django.db import models
 from uuid import uuid4
 
+def upload_event_iamge(instance,filename):
+    return f"{instance.id}-{filename}"
+
 class Event(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     name = models.CharField(max_length=200, help_text="name")
@@ -13,6 +16,7 @@ class Event(models.Model):
     neighborhood = models.CharField(max_length=50, help_text="neighborhood")
     street = models.CharField(max_length=50, help_text="street")
     number = models.IntegerField(help_text="number")
+    image = models.ImageField(upload_to=upload_event_iamge, blank=True, null=True)
 
     def __str__(self):
         return self.name
