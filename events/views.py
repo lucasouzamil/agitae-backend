@@ -85,6 +85,41 @@ def api_eventtype(request, eventtype_id):
     serialized_eventype = EventTypeSerializer(eventtype)
     return Response(serialized_eventype.data)
 
+@api_view(['GET', 'POST'])
+def api_eventsubtypes(request):
+    if request.method == 'POST':
+        new_eventsubtype_data = request.data
+        serializer = EventSubTypeSerializer(data=new_eventsubtype_data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    if request.method == 'GET':
+        eventsubtypes = EventSubType.objects.all()
+        serialized_eventsubtypes = EventSubTypeSerializer(eventsubtypes, many=True)
+        return Response(serialized_eventsubtypes.data)
+        
+    if request.method == 'DELETE':
+        eventsubtypes = EventSubType.objects.all()
+        eventsubtypes.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['GET', 'POST', 'DELETE'])
+def api_eventsubtype(request, eventsubtype_id):
+    try:
+        eventsubtype = EventSubType.objects.get(id=eventsubtype_id)
+    except EventSubType.DoesNotExist:
+        raise Http404()
+
+    if request.method == 'DELETE':
+        eventsubtype = EventSubType.objects.get(id=eventsubtype_id)
+        eventsubtype.delete()
+        return HttpResponse(status=204)
+    
+    serialized_eventsubtype = EventSubTypeSerializer(eventsubtype)
+    return Response(serialized_eventsubtype.data)
+
 def delete_event(event_id):
     try:
         event = Event.objects.get(id=event_id)

@@ -9,4 +9,6 @@ urlpatterns = [
     path('events/api/<str:event_id>/', views.api_event),
     path('eventtypes/api/', views.api_eventtypes),
     path('eventtypes/api/<str:eventtype_id>/', views.api_eventtype),
+    path('eventsubtypes/api/', views.api_eventsubtypes),
+    path('eventsubtypes/api/<str:eventsubtype_id>/', views.api_eventsubtype),
 ]
