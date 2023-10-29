@@ -5,6 +5,8 @@ from .models import Event
 from .api.serializers import EventSerializer
 from django.http import Http404, HttpResponse
 import os
+from datetime import date
+from django.utils.timezone import now
 
 @api_view(['GET', 'POST'])
 def api_events(request):
@@ -18,11 +20,16 @@ def api_events(request):
 
     if request.method == 'GET':
         events = Event.objects.all()
-        if events.exists():
+        outdated_events = [event for event in events if event.date < date.today()]
+        if outdated_events:
+            for event in outdated_events:
+                delete_event(event.id)
+            events = Event.objects.all()
             serialized_events = EventSerializer(events, many=True)
             return Response(serialized_events.data)
-        else:
-            return Response(status=status.HTTP_204_NO_CONTENT)
+    else:
+        serialized_events = EventSerializer(events, many=True)
+        return Response(serialized_events.data)
         
     if request.method == 'DELETE':
         events = Event.objects.all()
