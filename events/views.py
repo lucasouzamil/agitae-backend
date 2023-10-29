@@ -1,8 +1,8 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Event
-from .api.serializers import EventSerializer
+from .models import Event, EventType, EventSubType
+from .api.serializers import EventSerializer, EventTypeSerializer, EventSubTypeSerializer
 from django.http import Http404, HttpResponse
 import os
 from datetime import date
@@ -27,9 +27,9 @@ def api_events(request):
             events = Event.objects.all()
             serialized_events = EventSerializer(events, many=True)
             return Response(serialized_events.data)
-    else:
-        serialized_events = EventSerializer(events, many=True)
-        return Response(serialized_events.data)
+        else:
+            serialized_events = EventSerializer(events, many=True)
+            return Response(serialized_events.data)
         
     if request.method == 'DELETE':
         events = Event.objects.all()
@@ -50,6 +50,40 @@ def api_event(request, event_id):
     serialized_event = EventSerializer(event)
     return Response(serialized_event.data)
 
+@api_view(['GET', 'POST'])
+def api_eventtypes(request):
+    if request.method == 'POST':
+        new_eventtype_data = request.data
+        serializer = EventTypeSerializer(data=new_eventtype_data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    if request.method == 'GET':
+        eventtypes = EventType.objects.all()
+        serialized_eventtypes = EventTypeSerializer(eventtypes, many=True)
+        return Response(serialized_eventtypes.data)
+        
+    if request.method == 'DELETE':
+        eventtypes = EventType.objects.all()
+        eventtypes.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['GET', 'POST', 'DELETE'])
+def api_eventtype(request, eventtype_id):
+    try:
+        eventtype = EventType.objects.get(id=eventtype_id)
+    except EventType.DoesNotExist:
+        raise Http404()
+
+    if request.method == 'DELETE':
+        eventtype = EventType.objects.get(id=eventtype_id)
+        eventtype.delete()
+        return HttpResponse(status=204)
+    
+    serialized_eventype = EventTypeSerializer(eventtype)
+    return Response(serialized_eventype.data)
 
 def delete_event(event_id):
     try:
