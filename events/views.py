@@ -4,6 +4,7 @@ from rest_framework import status
 from .models import Event
 from .api.serializers import EventSerializer
 from django.http import Http404, HttpResponse
+import os
 
 @api_view(['GET', 'POST'])
 def api_events(request):
@@ -36,8 +37,20 @@ def api_event(request, event_id):
         raise Http404()
 
     if request.method == 'DELETE':
-        Event.objects.filter(id=event_id).delete()
+        delete_event(event_id)
         return HttpResponse(status=204)
     
     serialized_event = EventSerializer(event)
     return Response(serialized_event.data)
+
+
+def delete_event(event_id):
+    try:
+        event = Event.objects.get(id=event_id)
+        img_name=event.image.name
+        if len(img_name.split(f'{str(event.id)}')) > 1:
+            media_path = os.path.join(os.getcwd(), 'media', img_name)
+            os.remove(media_path)
+        event.delete()
+    except Event.DoesNotExist:
+        return Response(status=status.HTTP_204_NO_CONTENT)

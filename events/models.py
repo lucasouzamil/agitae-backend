@@ -2,7 +2,7 @@ from django.db import models
 from uuid import uuid4
 
 def upload_event_iamge(instance,filename):
-    return f"{instance.id}-{filename}"
+    return f"{instance.id}{filename}"
 
 class Event(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
