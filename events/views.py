@@ -8,11 +8,14 @@ import os
 from datetime import date
 from django.utils.timezone import now
 
-@api_view(['GET', 'POST'])
+@api_view(['GET', 'POST', 'DELETE'])
 def api_events(request):
     if request.method == 'POST':
         new_event_data = request.data
         serializer = EventSerializer(data=new_event_data)
+        print('a')
+        print(serializer)
+        print('a')
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -33,7 +36,8 @@ def api_events(request):
         
     if request.method == 'DELETE':
         events = Event.objects.all()
-        events.delete()
+        for event in events:
+            delete_event(event.id)
         return Response(status=status.HTTP_204_NO_CONTENT)
         
 @api_view(['GET', 'POST', 'DELETE'])
@@ -119,6 +123,22 @@ def api_eventsubtype(request, eventsubtype_id):
     
     serialized_eventsubtype = EventSubTypeSerializer(eventsubtype)
     return Response(serialized_eventsubtype.data)
+
+@api_view(['PUT'])
+def api_puteventonsubtype(request, subtype_id):
+    try:
+        eventsubtype = EventSubType.objects.get(id=subtype_id)
+    except EventSubType.DoesNotExist:
+        raise Http404()
+
+    if request.method == 'PUT':
+        data = request.data
+
+        eventsubtype.events.add(data.get('event'))
+
+        serialized_eventsubtype = EventSubTypeSerializer(eventsubtype)
+
+        return Response(serialized_eventsubtype.data)
 
 def delete_event(event_id):
     try:

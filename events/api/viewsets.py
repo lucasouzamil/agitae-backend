@@ -3,8 +3,8 @@ from events.api import serializers
 from events import models
 
 class EventViewSet(viewsets.ModelViewSet):
-    serializer_class=serializers.EventTypeSerializer
-    queryset=models.EventType.objects.all()
+    serializer_class=serializers.EventSerializer
+    queryset=models.Event.objects.all()
 
 class EventTypeViewSet(viewsets.ModelViewSet):
     serializer_class=serializers.EventTypeSerializer

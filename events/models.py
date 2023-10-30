@@ -7,7 +7,7 @@ def upload_event_iamge(instance,filename):
 
 class Event(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    name = models.CharField(max_length=200, help_text="name")
+    name = models.CharField(max_length=50, help_text="name")
     description = models.TextField(max_length=1000, help_text="description")
     url = models.URLField(help_text="url")
     date = models.DateField(help_text="date")
